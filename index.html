@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 Tabel Nama & Cita-Cita</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .admin-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 15px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        #dataForm {
+            display: flex;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #dataForm input, .admin-form input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        #dataForm button, .admin-form button {
+            padding: 15px 30px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .limit-info {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .admin-panel {
+            padding: 30px;
+            background: #e8f5e8;
+            border-bottom: 3px solid #28a745;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .admin-form {
+            max-width: 600px;
+            margin: 20px 0;
+        }
+
+        .admin-form form {
+            display: flex;
+            gap: 15px;
+        }
+
+        .admin-controls {
+            margin-top: 20px;
+        }
+
+        .danger-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .table-container {
+            padding: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #4facfe;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .admin-only {
+            background: #dc3545 !important;
+            font-weight: bold;
+        }
+
+        .no-action {
+            color: #999;
+            font-style: italic;
+        }
+
+        .total-info {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #4facfe;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            #dataForm, .admin-form form {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 10px 5px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Tabel Nama & Cita-Cita</h1>
+            <button id="adminBtn" class="admin-btn">🔐 Jadi Admin</button>
+        </header>
+
+        <!-- Modal Login Admin -->
+        <div id="adminModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>🔐 Login Admin</h2>
+                <p><strong>Hanya admin yang tahu password!</strong></p>
+                <input type="password" id="adminPassword" placeholder="Masukkan password admin">
+                <button id="loginBtn">Masuk Admin</button>
+            </div>
+        </div>
+
+        <!-- Form Input Data -->
+        <div class="form-section" id="userFormSection">
+            <form id="dataForm">
+                <input type="text" id="nama" placeholder="Nama Lengkap" required>
+                <input type="text" id="citaCita" placeholder="Cita-Cita" required>
+                <button type="submit" id="submitBtn">Kirim Data</button>
+            </form>
+            <p id="limitInfo" class="limit-info">Anda bisa kirim 1 data. Admin unlimited!</p>
+        </div>
+
+        <!-- Panel Admin -->
+        <div id="adminPanel" class="admin-panel" style="display: none;">
+            <h2>🛠️ Panel Admin</h2>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+            <div class="admin-form">
+                <form id="adminForm">
+                    <input type="text" id="adminNama" placeholder="Nama" required>
+                    <input type="text" id="adminCitaCita" placeholder="Cita-Cita" required>
+                    <button type="submit">Tambah Data</button>
+                </form>
+            </div>
+            <div class="admin-controls">
+                <button id="clearAllBtn" class="danger-btn">🗑️ Hapus Semua Data</button>
+            </div>
+        </div>
+
+        <!-- Tabel Data -->
+        <div class="table-container">
+            <h2>Daftar Nama & Cita-Cita</h2>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Cita-Cita</th>
+                        <th>Tanggal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <p id="totalData" class="total-info">Total Data: 0 orang</p>
+        </div>
+    </div>
+
+    <script>
+        // 🔥 PASSWORD ADMIN: 1234 (TERSEMBUNYI) 🔥
+        const ADMIN_PASSWORD = "1234";
+        
+        // Inisialisasi
+        let isAdmin = localStorage.getItem('isAdminSession') === 'true';
+        let userSubmissions = parseInt(localStorage.getItem('userSubmissions') || '0');
+        const MAX_USER_SUBMISSIONS = 1;
+        const STORAGE_KEY = "namaCitaCitaData";
+
+        // Load data saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateUI();
+            
+            // Event listeners
+            document.getElementById('adminBtn').addEventListener('click', showAdminModal);
+            document.getElementById('dataForm').addEventListener('submit', handleUserSubmit);
+            document.getElementById('adminForm').addEventListener('submit', handleAdminSubmit);
+            document.getElementById('loginBtn').addEventListener('click', handleAdminLogin);
+            document.getElementById('logoutBtn').addEventListener('click', logoutAdmin);
+            document.getElementById('clearAllBtn').addEventListener('click', clearAllData);
+            
+            // Modal close
+            document.querySelector('.close').addEventListener('click', hideAdminModal);
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('adminModal');
+                if (event.target === modal) {
+                    hideAdminModal();
+                }
+            });
+        });
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            displayTable(data);
+            document.getElementById('totalData').textContent = `Total Data: ${data.length} orang`;
+        }
+
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            loadData();
+        }
+
+        function displayTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const deleteButtonText = isAdmin ? '🗑️ Hapus' : '🔒 Admin Only';
+                const deleteButtonClass = isAdmin ? 'delete-btn' : 'no-action';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.citaCita}</td>
+                    <td>${new Date(item.tanggal).toLocaleDateString('id-ID')}</td>
+                    <td>
+                        <span class="${deleteButtonClass}" ${isAdmin ? `onclick="deleteData(${item.id})"` : ''}>
+                            ${deleteButtonText}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function handleUserSubmit(e) {
+            e.preventDefault();
+            
+            if (!isAdmin && userSubmissions >= MAX_USER_SUBMISSIONS) {
+                alert('❌ Anda sudah kirim 1 data! Login admin untuk unlimited.');
+                return;
+            }
+            
+            const namaInput = isAdmin ? 'adminNama' : 'nama';
+            const citaCitaInput = isAdmin ? 'adminCitaCita' : 'citaCita';
+            
+            const nama = document.getElementById(namaInput).value.trim();
+            const citaCita = document.getElementById(citaCitaInput).value.trim();
+            
+            if (!nama || !citaCita) {
+                alert('❌ Nama dan cita-cita harus diisi!');
+                return;
+            }
+            
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const newData = {
+                id: Date.now(),
+                nama: nama,
+                citaCita: citaCita,
+                tanggal: new Date().toISOString(),
+                isAdmin: isAdmin
+            };
+            
+            data.unshift(newData);
+            saveData(data);
+            
+            if (!isAdmin) {
+                userSubmissions++;
+                localStorage.setItem('userSubmissions', userSubmissions);
+                updateUI();
+            }
+            
+            document.getElementById('dataForm').reset();
+            document.getElementById('adminForm').reset();
+            alert('✅ Data tersimpan! Semua orang bisa lihat.');
+        }
+
+        function handleAdminSubmit(e) {
+            e.preventDefault();
+            handleUserSubmit(e);
+        }
+
+        function handleAdminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                localStorage.setItem('isAdminSession', 'true');
+                hideAdminModal();
+                updateUI();
+                loadData();
+                alert('🎉 Admin login berhasil!');
+            } else {
+                alert('❌ Password salah!');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            localStorage.removeItem('isAdminSession');
+            updateUI();
+            loadData();
+        }
+
+        function updateUI() {
+            const userFormSection = document.getElementById('userFormSection');
+            const adminPanel = document.getElementById('adminPanel');
+            const limitInfo = document.getElementById('limitInfo');
+            
+            if (isAdmin) {
+                userFormSection.style.display = 'none';
+                adminPanel.style.display = 'block';
+                limitInfo.style.display = 'none';
+            } else {
+                userFormSection.style.display = 'block';
+                adminPanel.style.display = 'none';
+                
+                if (userSubmissions >= MAX_USER_SUBMISSIONS) {
+                    limitInfo.innerHTML = '⚠️ <strong>Sudah 1 data!</strong> Login admin untuk unlimited.';
+                    limitInfo.style.color = '#ff6b6b';
+                } else {
+                    limitInfo.textContent = 'Anda bisa kirim 1 data. Admin unlimited!';
+                    limitInfo.style.color = '#666';
+                }
+            }
+        }
+
+        function showAdminModal() {
+            document.getElementById('adminModal').style.display = 'block';
+            document.getElementById('adminPassword').focus();
+        }
+
+        function hideAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function deleteData(id) {
+            if (!isAdmin) {
+                alert('❌ Hanya admin yang bisa hapus data!');
+                return;
+            }
+            if (confirm('Yakin hapus data ini?')) {
+                const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                const filteredData = data.filter(item => item.id !== id);
+                saveData(filteredData);
+            }
+        }
+
+        function clearAllData() {
+            if (!isAdmin) {
+                alert('❌ Hanya admin yang bisa hapus semua data!');
+                return;
+            }
+            if (confirm('⚠️ HAPUS SEMUA DATA? Tidak bisa dibatalkan!')) {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem('userSubmissions');
+                userSubmissions = 0;
+                loadData();
+                alert('🗑️ Semua data dihapus!');
+            }
+        }
+
+        // Fungsi global untuk tombol delete
+        window.deleteData = deleteData;
+    </script>
+</body>
+</html>
