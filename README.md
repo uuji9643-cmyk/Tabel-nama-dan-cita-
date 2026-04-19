@@ -1,1 +1,0 @@
-# Tabel-nama-dan-cita-
