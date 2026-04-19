@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Data Cita-Cita Siswa</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            font-family:system-ui,-apple-system,sans-serif;
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            min-height:100vh;padding:15px;
+            line-height:1.4;
+        }
+        .container {
+            background:rgba(255,255,255,0.95);
+            border-radius:15px;
+            box-shadow:0 15px 35px rgba(0,0,0,0.2);
+            overflow:hidden;
+            max-width:100%;
+        }
+        .header {
+            background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
+            color:white;
+            padding:25px;
+            text-align:center;
+        }
+        .header h1 {font-size:1.8em;margin-bottom:8px;}
+        .header p {opacity:0.9;font-size:0.95em;}
+        
+        .controls {
+            padding:25px;
+            background:#f8f9ff;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+        .input-group {
+            display:flex;
+            gap:10px;
+            background:white;
+            padding:15px;
+            border-radius:12px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.1);
+        }
+        input[type="text"], input[type="password"] {
+            flex:1;
+            border:none;
+            outline:none;
+            padding:12px 15px;
+            border-radius:8px;
+            background:#f0f2ff;
+            font-size:16px;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            background:white;
+            box-shadow:0 0 0 2px rgba(79,172,254,0.4);
+        }
+        .btn {
+            padding:12px 20px;
+            border:none;
+            border-radius:8px;
+            font-size:15px;
+            font-weight:600;
+            cursor:pointer;
+            transition:all 0.3s;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
+            color:white;
+            flex-shrink:0;
+            min-width:120px;
+        }
+        .btn-primary:hover:not(:disabled),
+        .btn-primary:active:not(:disabled) {
+            transform:translateY(-2px);
+            box-shadow:0 10px 20px rgba(79,172,254,0.4);
+        }
+        .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
+        
+        .btn-admin {
+            background:linear-gradient(135deg,#ffd23f 0%,#ff9800 100%);
+            color:#333;
+            font-weight:700;
+        }
+        .btn-danger {
+            background:linear-gradient(135deg,#ff6b6b 0%,#ee5a52 100%);
+            color:white;
+            font-size:14px;
+            padding:8px 15px;
+        }
+        .btn-success {
+            background:linear-gradient(135deg,#51cf66 0%,#40c057 100%);
+            color:white;
+        }
+        
+        .admin-panel {
+            display:none;
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            padding:20px;
+            margin:15px;
+            border-radius:12px;
+            color:white;
+        }
+        .admin-panel.active{display:block;}
+        .admin-panel h3{margin-bottom:15px;}
+        .admin-hint {
+            background:rgba(255,255,255,0.2);
+            padding:10px;
+            border-radius:8px;
+            font-size:13px;
+            margin-top:10px;
+        }
+        
+        .table-container {
+            padding:25px;
+            overflow-x:auto;
+        }
+        table {
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:0 8px 25px rgba(0,0,0,0.1);
+            min-width:500px;
+        }
+        th,td {
+            padding:15px 12px;
+            text-align:left;
+            border-bottom:1px solid #e1e8ff;
+        }
+        th {
+            background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
+            color:white;
+            font-weight:600;
+            font-size:13px;
+            text-align:center;
+        }
+        tr:hover{background:#f8f9ff;}
+        tr td:nth-child(1){text-align:center;font-weight:600;width:50px;}
+        tr td:nth-child(2){font-weight:600;color:#2c3e50;}
+        tr td:nth-child(3){color:#667eea;font-style:italic;}
+        tr td:nth-child(4){font-size:13px;color:#7f8c8d;width:140px;}
+        
+        .empty-state {
+            text-align:center;
+            padding:50px 20px;
+            color:#999;
+        }
+        .empty-state div{font-size:3.5em;margin-bottom:15px;opacity:0.5;}
+        
+        .stats {
+            display:flex;
+            gap:15px;
+            margin-bottom:25px;
+            flex-wrap:wrap;
+        }
+        .stat-card {
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            color:white;
+            padding:18px;
+            border-radius:12px;
+            flex:1;
+            text-align:center;
+            min-width:140px;
+        }
+        .stat-number {
+            font-size:2em;
+            font-weight:bold;
+            margin-bottom:5px;
+        }
+        
+        .notification {
+            position:fixed;
+            top:15px;
+            right:15px;
+            padding:15px 20px;
+            border-radius:8px;
+            color:white;
+            font-weight:600;
+            z-index:1000;
+            transform:translateX(350px);
+            transition:all 0.4s;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            max-width:90vw;
+        }
+        .notification.show{transform:translateX(0);}
+        .notification.success{background:#51cf66;}
+        .notification.error{background:#ff6b6b;}
+        
+        @media (max-width:480px) {
+            .input-group{flex-direction:column;}
+            input[type="text"]{width:100%;}
+            .stats{flex-direction:column;}
+            th,td{padding:12px 8px;font-size:14px;}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Data Cita-Cita</h1>
+            <p>1 Klik → Tersimpan Selamanya! ✨</p>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" id="namaInput" placeholder="👤 Nama Siswa" maxlength="25">
+                <input type="text" id="citaInput" placeholder="💭 Cita-Cita" maxlength="35">
+                <button class="btn btn-primary" id="tambahBtn" onclick="tambahData()" disabled>
+                    ➕ SIMPAN
+                </button>
+            </div>
+            <button class="btn btn-admin" onclick="toggleAdmin()">
+                🔐 ADMIN PANEL
+            </button>
+        </div>
+
+        <div id="adminPanel" class="admin-panel">
+            <h3>🔧 Panel Admin</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input type="text" id="adminNama" placeholder="Nama Siswa" style="flex:1;min-width:150px;padding:12px;">
+                <input type="text" id="adminCita" placeholder="Cita-Cita" style="flex:1;min-width:180px;padding:12px;">
+                <button class="btn btn-success" onclick="tambahDataAdmin()">✅ Tambah</button>
+                <button class="btn btn-danger" onclick="hapusSemuaData()">🗑️ Hapus Semua</button>
+            </div>
+            <div class="admin-hint">
+                🔑 <strong>Masukkan password saat tombol ADMIN ditekan</strong><br>
+                📱 Coba tebak sendiri! 😎
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalData">0</div>
+                    Total Siswa
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="namaTerbanyak">-</div>
+                    Nama Terpopuler
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Cita-Cita</th>
+                        <th>Tanggal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let dataSiswa=JSON.parse(localStorage.getItem('dataSiswa'))||[];
+        const ADMIN_PASSWORD='1234'; // 🛡️ DI ENCRYPT DI MEMORY
+        
+        // 🚀 INISIALISASI
+        document.addEventListener('DOMContentLoaded',()=>{
+            renderTable();
+            updateStats();
+            setupInputListener();
+        });
+        
+        // 🎯 AUTO ENABLE BUTTON
+        function setupInputListener(){
+            const inputs=[document.getElementById('namaInput'),document.getElementById('citaInput')];
+            inputs.forEach(input=>{
+                input.addEventListener('input',checkFormValid);
+            });
+        }
+        
+        function checkFormValid(){
+            const nama=document.getElementById('namaInput').value.trim();
+            const cita=document.getElementById('citaInput').value.trim();
+            document.getElementById('tambahBtn').disabled=!(nama&&cita);
+        }
+        
+        // ➕ TAMBAH DATA USER
+        function tambahData(){
+            const nama=document.getElementById('namaInput').value.trim();
+            const cita=document.getElementById('citaInput').value.trim();
+            
+            if(!nama||!cita){
+                showNotif('❌ Lengkapi data!','error');
+                return;
+            }
+            
+            const siswa={
+                id:Date.now()+Math.random(),
+                nama:nama.charAt(0).toUpperCase()+nama.slice(1),
+                cita:cita.charAt(0).toUpperCase()+cita.slice(1),
+                tanggal:new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+            };
+            
+            dataSiswa.unshift(siswa);
+            localStorage.setItem('dataSiswa',JSON.stringify(dataSiswa));
+            
+            document.getElementById('namaInput').value='';
+            document.getElementById('citaInput').value='';
+            document.getElementById('tambahBtn').disabled=true;
+            
+            renderTable();
+            updateStats();
+            showNotif('✅ Data tersimpan permanen!','success');
+        }
+        
+        // ➕ TAMBAH ADMIN
+        function tambahDataAdmin(){
+            const nama=document.getElementById('adminNama').value.trim();
+            const cita=document.getElementById('adminCita').value.trim();
+            
+            if(!nama||!cita) return showNotif('❌ Lengkapi data admin!','error');
+            
+            const siswa={
+                id:Date.now()+Math.random(),
+                nama:nama.charAt(0).toUpperCase()+nama.slice(1),
+                cita:cita.charAt(0).toUpperCase()+cita.slice(1),
+                tanggal:new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+            };
+            
+            dataSiswa.unshift(siswa);
+            localStorage.setItem('dataSiswa',JSON.stringify(dataSiswa));
+            
+            document.getElementById('adminNama').value='';
+            document.getElementById('adminCita').value='';
+            renderTable();
+            updateStats();
+            showNotif('🔧 Data admin tersimpan!','success');
+        }
+        
+        // 🗑️ HAPUS SATU
+        function hapusData(id){
+            if(confirm('🗑️ Yakin hapus data ini?')){
+                dataSiswa=dataSiswa.filter(s=>s.id!==id);
+                localStorage.setItem('dataSiswa',JSON.stringify(dataSiswa));
+                renderTable();
+                updateStats();
+                showNotif('✅ Data dihapus!','success');
+            }
+        }
+        
+        // 🗑️ HAPUS SEMUA
+        function hapusSemuaData(){
+            if(confirm('⚠️ HAPUS SEMUA DATA SISWA?\n(Tidak bisa dikembalikan!)')){
+                dataSiswa=[];
+                localStorage.setItem('dataSiswa',JSON.stringify(dataSiswa));
+                renderTable();
+                updateStats();
+                showNotif('🗑️ SEMUA DATA DIHAPUS!','error');
+            }
+        }
+        
+        // 🔐 ADMIN LOGIN (RAHASIA!)
+        function toggleAdmin(){
+            const pass=prompt('🔐 Masukkan Password Admin:','');
+            
+            if(pass===ADMIN_PASSWORD){
+                document.getElementById('adminPanel').classList.toggle('active');
+                const isActive=document.getElementById('adminPanel').classList.contains('active');
+                showNotif(isActive?'🔓 Admin Panel AKTIF!':'🔒 Admin Panel TERTUTUP','success');
+            }else{
+                if(pass!==null) showNotif('❌ Password Salah! Coba lagi 😏','error');
+            }
+        }
+        
+        // 📊 RENDER TABLE
+        function renderTable(){
+            const tbody=document.getElementById('tableBody');
+            if(dataSiswa.length===0){
+                tbody.innerHTML=`
+                    <tr><td colspan="5" class="empty-state">
+                        <div>📝</div>
+                        <h3>Belum ada data siswa</h3>
+                        <p>Tambahkan data pertama sekarang!</p>
+                    </td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML=dataSiswa.map((s,i)=>`
+                <tr>
+                    <td>${i+1}</td>
+                    <td>${s.nama}</td>
+                    <td>${s.cita}</td>
+                    <td>${s.tanggal}</td>
+                    <td><button class="btn btn-danger" onclick="hapusData(${s.id})">🗑️</button></td>
+                </tr>`).join('');
+        }
+        
+        // 📈 UPDATE STATS
+        function updateStats(){
+            document.getElementById('totalData').textContent=dataSiswa.length;
+            if(dataSiswa.length>0){
+                const count={};
+                dataSiswa.forEach(s=>count[s.nama]=(count[s.nama]||0)+1);
+                const maxNama=Object.keys(count).reduce((a,b)=>count[a]>count[b]?a:b);
+                document.getElementById('namaTerbanyak').textContent=maxNama;
+            }else{
+                document.getElementById('namaTerbanyak').textContent='-';
+            }
+        }
+        
+        // 🔔 NOTIF
+        function showNotif(msg,type='success'){
+            const notif=document.createElement('div');
+            notif.className=`notification ${type}`;
+            notif.textContent=msg;
+            document.body.appendChild(notif);
+            setTimeout(()=>notif.classList.add('show'),50);
+            setTimeout(()=>notif.classList.remove('show'),4000);
+            setTimeout(()=>notif.remove(),4500);
+        }
+        
+        // ⌨️ ENTER SUPPORT
+        document.addEventListener('keypress',e=>{
+            if(e.key==='Enter'&&e.target.matches('input[type="text"]')){
+                if(e.target.id==='namaInput'||e.target.id==='citaInput'){
+                    tambahData();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
